@@ -17,6 +17,7 @@ func ExamplePrettyHtmlDiff() {
 
 	fmt.Println(htmltestingutils.PrettyHtmlDiff(strings.NewReader(actual), "label[for=user_1_name]", expected))
 	fmt.Println(htmltestingutils.PrettyHtmlDiff(strings.NewReader(actual), "header", expected))
+	fmt.Println(htmltestingutils.PrettyHtmlDiff(strings.NewReader(actual), ".qor-form-section-rows", expected))
 	//Output:
 	// --- Expected
 	// +++ Actual
@@ -39,6 +40,16 @@ func ExamplePrettyHtmlDiff() {
 	// +    </span>
 	// +  </div>
 	// +</header>
+	//
+	// --- Expected
+	// +++ Actual
+	// @@ -1,3 +1,3 @@
+	// -<label class="qor-field__label mdl-textfield__label" for="user_1_name">
+	// -  Name1
+	// -</label>
+	// +<div class="qor-form-section-rows qor-section-columns-1 clearfix">
+	// +  <input id="user_1_id" class="qor-hidden__primary_key" name="QorResource.ID" value="1" type="hidden"/>
+	// +</div>
 }
 
 var actual = `

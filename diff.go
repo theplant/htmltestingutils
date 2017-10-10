@@ -9,6 +9,7 @@ import (
 	"github.com/andybalholm/cascadia"
 	"github.com/pmezard/go-difflib/difflib"
 	"golang.org/x/net/html"
+	"golang.org/x/net/html/atom"
 
 	"github.com/yosssi/gohtml"
 )
@@ -16,7 +17,6 @@ import (
 func PrettyHtmlDiff(actual io.Reader, actualCssSelector string, expected string) (r string) {
 	buf := bytes.NewBuffer(nil)
 	io.Copy(buf, actual)
-	fexpected := trimLinesAndFormat(expected)
 
 	sel, err := cascadia.Compile(actualCssSelector)
 	if err != nil {
@@ -35,6 +35,7 @@ func PrettyHtmlDiff(actual io.Reader, actualCssSelector string, expected string)
 	html.Render(selBuf, mn)
 
 	factual := trimLinesAndFormat(selBuf.String())
+	fexpected := trimLinesAndFormat(expected)
 	if fexpected != factual {
 		diff := difflib.UnifiedDiff{
 			A:        difflib.SplitLines(fexpected),
@@ -55,5 +56,15 @@ func trimLinesAndFormat(content string) string {
 	for _, l := range lines {
 		trimmedBuf.WriteString(strings.TrimSpace(l) + "\n")
 	}
-	return gohtml.Format(trimmedBuf.String())
+
+	ns, err := html.ParseFragment(trimmedBuf, &html.Node{Data: "body", Type: html.ElementNode, DataAtom: atom.Body})
+	if err != nil {
+		panic(err)
+	}
+
+	renderBuf := bytes.NewBuffer(nil)
+	for _, n := range ns {
+		html.Render(renderBuf, n)
+	}
+	return gohtml.Format(renderBuf.String())
 }
