@@ -16,7 +16,7 @@ import (
 func PrettyHtmlDiff(actual io.Reader, actualCssSelector string, expected string) (r string) {
 	buf := bytes.NewBuffer(nil)
 	io.Copy(buf, actual)
-	fexpected := gohtml.Format(expected)
+	fexpected := trimLinesAndFormat(expected)
 
 	sel, err := cascadia.Compile(actualCssSelector)
 	if err != nil {
@@ -34,13 +34,7 @@ func PrettyHtmlDiff(actual io.Reader, actualCssSelector string, expected string)
 	selBuf := bytes.NewBuffer(nil)
 	html.Render(selBuf, mn)
 
-	trimmedBuf := bytes.NewBuffer(nil)
-	lines := strings.Split(selBuf.String(), "\n")
-	for _, l := range lines {
-		trimmedBuf.WriteString(strings.TrimSpace(l) + "\n")
-	}
-
-	factual := gohtml.Format(trimmedBuf.String())
+	factual := trimLinesAndFormat(selBuf.String())
 	if fexpected != factual {
 		diff := difflib.UnifiedDiff{
 			A:        difflib.SplitLines(fexpected),
@@ -53,4 +47,13 @@ func PrettyHtmlDiff(actual io.Reader, actualCssSelector string, expected string)
 	}
 
 	return
+}
+
+func trimLinesAndFormat(content string) string {
+	trimmedBuf := bytes.NewBuffer(nil)
+	lines := strings.Split(content, "\n")
+	for _, l := range lines {
+		trimmedBuf.WriteString(strings.TrimSpace(l) + "\n")
+	}
+	return gohtml.Format(trimmedBuf.String())
 }

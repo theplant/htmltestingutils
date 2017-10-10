@@ -11,12 +11,12 @@ func ExamplePrettyHtmlDiff() {
 
 	expected := `
 <label class="qor-field__label mdl-textfield__label" for="user_1_name">
-Name1
+  Name1
 </label>
 	`
 
-	diff := htmltestingutils.PrettyHtmlDiff(strings.NewReader(actual), "label[for=user_1_name]", expected)
-	fmt.Println(diff)
+	fmt.Println(htmltestingutils.PrettyHtmlDiff(strings.NewReader(actual), "label[for=user_1_name]", expected))
+	fmt.Println(htmltestingutils.PrettyHtmlDiff(strings.NewReader(actual), "header", expected))
 	//Output:
 	// --- Expected
 	// +++ Actual
@@ -25,7 +25,20 @@ Name1
 	// -  Name1
 	// +  Name
 	//  </label>
-
+	//
+	// --- Expected
+	// +++ Actual
+	// @@ -1,3 +1,7 @@
+	// -<label class="qor-field__label mdl-textfield__label" for="user_1_name">
+	// -  Name1
+	// -</label>
+	// +<header class="mdl-layout__header">
+	// +  <div class="mdl-layout__header-row">
+	// +    <span class="mdl-layout-title">
+	// +      Edit User
+	// +    </span>
+	// +  </div>
+	// +</header>
 }
 
 var actual = `
